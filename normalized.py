@@ -3,18 +3,19 @@ import numpy as np
 from utils import *
 
 
-def calib(n, dis):
-    name = f'{n}_{dis}'
+def read_csv(name, dis):
+    name_dis = f'{name}_{dis}'
 
-    f = open(f'{root_dir + name}/{name}_whole.csv', 'r', encoding='utf-8')
-    data = csv.reader(f)
-    next(data)
+    f = open(f'{root_dir + name_dis}/{name_dis}_whole.csv', 'r', encoding='utf-8')
+    datas = csv.reader(f)
+    next(datas)
 
     data_list = []
-    for rr in data:
-        data_list.append(rr)
+    for data in datas:
+        data_list.append(data)
     f.close()
 
+    # id, 왼쪽/오른쪽 동공 중심, 랜드마크 좌표 가져오기
     id = []
     l_labels = []
     r_labels = []
@@ -41,10 +42,11 @@ def calib(n, dis):
     return id, l_label, r_label, label
 
 
-# 동공과 코 거리 9개 csv저장
-def dist(n, dis, l_label, r_label, label):
-    name = f'{n}_{dis}'
+# 왼/오 동공-코거리 각각 9개 정규화값 csv 저장
+def normal_dist(name, dis, l_label, r_label, label, saved_dir):
+    name_dis = f'{name}_{dis}'
 
+    # 동공과 코 거리계산 왼/오 각각 9개
     l_dis = []
     r_dis = []
     for i, (l, r) in enumerate(zip(l_label, r_label)):
