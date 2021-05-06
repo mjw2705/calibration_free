@@ -63,14 +63,14 @@ def normal_dist(name, dis, l_label, r_label, label, saved_dir):
     l_dis = np.array(l_dis)
     r_dis = np.array(r_dis)
 
-    # 정규화값 csv파일 저장
-    # distance = [twoeyeend, nose_leyeend, nose_reyeend, twoeyein, nose_leyein, nose_reyein, outface, lout_chin, rout_chin]
-    distance = [lmouseend, rmouseend]
+    # 왼/오 동공-코거리 각 9개 정규화값 csv 저장
+    distance = [twoeyeend, nose_leyeend, nose_reyeend, twoeyein, nose_leyein, nose_reyein, upnose_leyein, upnose_reyein,
+                outface, lout_chin, rout_chin, lmouse, rmouse, lmouseend, rmouseend]
 
     for distan in distance:
         dis = distan(label, l_dis, r_dis)
 
-        f = open(f'csv/{name}_{distan.__name__}.csv', 'w', encoding='utf-8', newline='')
+        f = open(f'{saved_dir}/{name_dis}_{distan.__name__}.csv', 'w', encoding='utf-8', newline='')
         writer = csv.writer(f)
         writer.writerow(['l_distance', '', '', '', '', '', '', '', '', 'r_distance'])
         for l, r in zip(dis[0], dis[1]):
@@ -83,11 +83,12 @@ def normal_dist(name, dis, l_label, r_label, label, saved_dir):
 
 root_dir = './data/'
 names = ['hhs', 'hny', 'jgw', 'jwh', 'knh', 'lgy', 'lmk', 'lsg', 'mjw', 'nes', 'sgh', 'ssw', 'ysk']
+saved_dir = 'csvs'
 
 for n in names:
-    a = calib(n, 100)
-    b = calib(n, 150)
-    inter = np.intersect1d(a[0], b[0]) #id 비교
+    a = read_csv(n, 100)
+    b = read_csv(n, 150)
+    inter1015 = np.intersect1d(a[0], b[0])  # id 비교해서 100, 150 둘다 있는 id만
 
     id00 = []
     l_label00 = []
@@ -99,13 +100,13 @@ for n in names:
     label50 = []
 
     for i in range(len(a[0])):
-        if a[0][i] in inter:
+        if a[0][i] in inter1015:
             id00.append(a[0][i])
             l_label00.append(a[1][i])
             r_label00.append(a[2][i])
             label00.append(a[3][i])
     for i in range(len(b[0])):
-        if b[0][i] in inter:
+        if b[0][i] in inter1015:
             id50.append(b[0][i])
             l_label50.append(b[1][i])
             r_label50.append(b[2][i])
@@ -120,6 +121,5 @@ for n in names:
     r_label150 = np.array(r_label50)
     label150 = np.array(label50)
 
-    dist(n, 100, l_label100, r_label100, label100)
-    dist(n, 150, l_label150, r_label150, label150)
-
+    normal_dist(n, 100, l_label100, r_label100, label100, saved_dir)
+    normal_dist(n, 150, l_label150, r_label150, label150, saved_dir)
