@@ -2,7 +2,7 @@ import csv
 from utils import *
 
 '''
-id 비교해서 100, 150cm에서 같은 id만 계산
+100, 150cm id 비교해서 같은 id만 계산
 '''
 def read_csv(name, dis):
     name_dis = f'{name}_{dis}'
@@ -84,7 +84,7 @@ def normal_dist(name, dis, l_label, r_label, label, saved_dir):
 
 root_dir = './data/'
 names = ['hhs', 'hny', 'jgw', 'jwh', 'knh', 'lgy', 'lmk', 'lsg', 'mjw', 'nes', 'sgh', 'ssw', 'ysk']
-saved_dir = 'cs'
+saved_dir = 'csv'
 
 for n in names:
     a = read_csv(n, 100)
