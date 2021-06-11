@@ -1,5 +1,5 @@
 import csv
-from utils import *
+from distance_utils import *
 
 
 root_dir = './data/'

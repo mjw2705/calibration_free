@@ -1,5 +1,5 @@
 import csv
-from utils import *
+from distance_utils import *
 
 '''
 100, 150cm id 비교해서 같은 id만 계산
