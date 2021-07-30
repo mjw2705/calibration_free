@@ -76,7 +76,7 @@ class MyApp(QMainWindow, main_ui):
                     cv2.waitKey(1)
                 else:
                     break
-        print('1')
+        # cap release 안됨
         self.cap.release()
 
     def getVideo_button(self):
