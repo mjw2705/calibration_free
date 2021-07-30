@@ -27,7 +27,9 @@ class MyApp(QMainWindow, main_ui):
         self.cap = None
         self.press_esc = False
         self.video_frame = False
-
+        self.get_video = False
+        self.get_cam = False
+        self.change_cam = False
 
         # 버튼에 기능 연결
         self.cam_comboBox.currentIndexChanged.connect(self.camSetting_combo) # 캠 번호
@@ -53,6 +55,9 @@ class MyApp(QMainWindow, main_ui):
         self.cam_num = int(self.cam_comboBox.currentText())
 
     def camSetting_button(self):
+        print(self.get_video)
+        self.get_cam = True
+
         self.cap = cv2.VideoCapture(self.cam_num, cv2.CAP_DSHOW)
 
         if not self.cap.isOpened():
@@ -65,24 +70,34 @@ class MyApp(QMainWindow, main_ui):
             self.cap = None
         else:
             self.startCamera()
+            self.get_video = False
+            print('camera stop')
 
     def startCamera(self):
+        self.get_cam = True
         if self.cap:
             while True:
                 self.ret, self.frame = self.cap.read()
-
                 if self.ret:
+                    print('1')
                     self.showImage(self.frame, self.display_label)
                     cv2.waitKey(1)
+                    # 비디오가 눌리면 stop
+                    if self.get_video:
+                        self.cap.release()
+                        break
+                    elif self.change_cam:
+                        self.cap.release()
+                        break
                 else:
                     break
-        # cap release 안됨
         self.cap.release()
 
     def getVideo_button(self):
+        self.get_video = True
+        print(self.get_video)
         self.video_path = QFileDialog.getOpenFileNames(self, 'Select video', self.init_dir)[0]
         print(self.video_path)
-        # self.video_label.setText(video_path)
 
         if self.video_path:
             for i, path in enumerate(self.video_path):
@@ -90,13 +105,14 @@ class MyApp(QMainWindow, main_ui):
         else:
             self.video_listWidget.clear()
 
-
     def selectVideo(self):
+        self.get_video = True
+        print(self.get_video)
         self.idx = self.video_listWidget.currentRow()
         self.cap = cv2.VideoCapture(self.video_path[self.idx])
 
         self.ret, self.frame = self.cap.read()
-        # self.cap.set(cv2.CAP_PROP_POS_FRAMES, 0)
+        self.cap.set(cv2.CAP_PROP_POS_FRAMES, 0)
 
         if self.ret:
             self.video_frame = True
@@ -107,10 +123,10 @@ class MyApp(QMainWindow, main_ui):
             self.video_frame = False
             print(self.video_frame)
             self.startVideo()
+            self.get_cam = False
         else:
             self.video_frame = True
             print(self.video_frame)
-
 
     def startVideo(self):
         print(self.video_frame)
@@ -123,7 +139,9 @@ class MyApp(QMainWindow, main_ui):
                     cv2.waitKey(1)
                 elif self.ret:
                     break
-
+                elif self.get_cam:
+                    self.cap.release()
+                    break
 
     def showImage(self, img, display_label):
         draw_img = img.copy()
@@ -146,7 +164,6 @@ class MyApp(QMainWindow, main_ui):
     def prgram_exit(self):
         self.press_esc = True
         QCoreApplication.instance().quit()
-
 
 
 if __name__ == '__main__':
