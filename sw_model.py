@@ -52,11 +52,12 @@ class MyApp(QMainWindow, main_ui):
         self.show()
 
     def camSetting_combo(self):
+        self.change_cam = True
         self.cam_num = int(self.cam_comboBox.currentText())
 
     def camSetting_button(self):
-        print(self.get_video)
         self.get_cam = True
+        self.change_cam = False
 
         self.cap = cv2.VideoCapture(self.cam_num, cv2.CAP_DSHOW)
 
@@ -82,20 +83,18 @@ class MyApp(QMainWindow, main_ui):
                     print('1')
                     self.showImage(self.frame, self.display_label)
                     cv2.waitKey(1)
-                    # 비디오가 눌리면 stop
-                    if self.get_video:
+
+                    # 비디오가 눌리면 / cam 바뀌면 stop
+                    if self.press_esc or self.get_video or self.change_cam:
                         self.cap.release()
                         break
-                    elif self.change_cam:
-                        self.cap.release()
-                        break
+
                 else:
                     break
         self.cap.release()
 
     def getVideo_button(self):
         self.get_video = True
-        print(self.get_video)
         self.video_path = QFileDialog.getOpenFileNames(self, 'Select video', self.init_dir)[0]
         print(self.video_path)
 
@@ -107,7 +106,6 @@ class MyApp(QMainWindow, main_ui):
 
     def selectVideo(self):
         self.get_video = True
-        print(self.get_video)
         self.idx = self.video_listWidget.currentRow()
         self.cap = cv2.VideoCapture(self.video_path[self.idx])
 
@@ -121,15 +119,12 @@ class MyApp(QMainWindow, main_ui):
     def Video_button(self):
         if self.video_frame:
             self.video_frame = False
-            print(self.video_frame)
             self.startVideo()
             self.get_cam = False
         else:
             self.video_frame = True
-            print(self.video_frame)
 
     def startVideo(self):
-        print(self.video_frame)
         if self.cap:
             while True:
                 self.ret, self.frame = self.cap.read()
@@ -139,7 +134,8 @@ class MyApp(QMainWindow, main_ui):
                     cv2.waitKey(1)
                 elif self.ret:
                     break
-                elif self.get_cam:
+                # cam이 눌리면 stop
+                elif self.press_esc or self.get_cam:
                     self.cap.release()
                     break
 

@@ -66,36 +66,38 @@ class MyApp(QMainWindow, main_ui):
 
             self.cap = None
         else:
+            self.change_cam = False
             self.startPlay()
-            self.change_video = False
+
             print('camera stop')
 
     def startPlay(self):
-        self.change_video = False
-        self.change_cam = False
-
         if self.cap:
             while True:
+                self.ret, self.frame = self.cap.read()
+
                 if self.press_esc or self.change_cam or self.change_video:
                     self.cap.release()
                     break
 
-                self.ret, self.frame = self.cap.read()
                 # cam
-                if self.ret:
+                if self.ret and not self.change_cam:
+                    print('1')
                     self.showImage(self.frame, self.display_label)
                     cv2.waitKey(1)
                 # video
-                elif self.ret and not self.video_frame:
+                elif not self.video_frame:
                     self.showImage(self.frame, self.display_label)
                     cv2.waitKey(1)
+                elif not self.change_video:
+                    break
                 # # 비디오 -> cam or cam -> 비디오 or cam 변경
                 # elif self.get_video or self.get_cam or self.change_cam:
                 #     self.cap.release()
                 #     break
 
     def getVideo_button(self):
-        # self.change_video = True
+        self.change_video = True
         self.video_path = QFileDialog.getOpenFileNames(self, 'Select video', self.init_dir)[0]
         print(self.video_path)
 
@@ -121,6 +123,7 @@ class MyApp(QMainWindow, main_ui):
     def videoPlayStop_button(self):
         if self.video_frame:
             self.video_frame = False
+            self.change_video = False
             self.startPlay()
         else:
             self.video_frame = True
