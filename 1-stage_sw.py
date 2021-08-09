@@ -26,10 +26,10 @@ class MyApp(QMainWindow, main_ui):
         self.cap = None
         self.press_esc = False
         self.video_frame = False
-        # self.get_video = False
-        # self.get_cam = False
+        self.get_video = False
+        self.get_cam = False
         self.change_cam = False
-        self.change_video = False
+        # self.change_video = False
 
         # 버튼에 기능 연결
         self.cam_comboBox.currentIndexChanged.connect(self.camSetting_combo) # 캠 번호
@@ -52,10 +52,12 @@ class MyApp(QMainWindow, main_ui):
         self.show()
 
     def camSetting_combo(self):
+        self.change_cam = True
         self.cam_num = int(self.cam_comboBox.currentText())
 
     def camSetting_button(self):
-        self.change_cam = True
+        self.get_cam = True
+        self.change_cam = False
         self.cap = cv2.VideoCapture(self.cam_num, cv2.CAP_DSHOW)
 
         if not self.cap.isOpened():
@@ -66,8 +68,8 @@ class MyApp(QMainWindow, main_ui):
 
             self.cap = None
         else:
-            self.change_cam = False
             self.startPlay()
+            self.get_video = False
 
             print('camera stop')
 
@@ -81,23 +83,27 @@ class MyApp(QMainWindow, main_ui):
                     break
 
                 # cam
-                if self.ret and not self.change_cam:
+                if self.ret and self.get_cam:
                     print('1')
                     self.showImage(self.frame, self.display_label)
                     cv2.waitKey(1)
+                    # 비디오가 눌리면 / cam 바뀌면 stop
+                    if self.press_esc or self.get_video or self.change_cam:
+                        self.cap.release()
+                        break
                 # video
-                elif not self.video_frame:
+                elif self.ret and self.get_video and not self.video_frame:
                     self.showImage(self.frame, self.display_label)
                     cv2.waitKey(1)
-                elif not self.change_video:
-                    break
-                # # 비디오 -> cam or cam -> 비디오 or cam 변경
-                # elif self.get_video or self.get_cam or self.change_cam:
-                #     self.cap.release()
-                #     break
+
+                    if self.ret:
+                        break
+                    elif self.press_esc or self.get_cam:
+                        self.cap.release()
+                        break
 
     def getVideo_button(self):
-        self.change_video = True
+        self.get_video = True
         self.video_path = QFileDialog.getOpenFileNames(self, 'Select video', self.init_dir)[0]
         print(self.video_path)
 
@@ -108,7 +114,7 @@ class MyApp(QMainWindow, main_ui):
             self.video_listWidget.clear()
 
     def selectVideo(self):
-        self.change_video = True
+        self.get_video = True
 
         self.idx = self.video_listWidget.currentRow()
         self.cap = cv2.VideoCapture(self.video_path[self.idx])
@@ -123,7 +129,7 @@ class MyApp(QMainWindow, main_ui):
     def videoPlayStop_button(self):
         if self.video_frame:
             self.video_frame = False
-            self.change_video = False
+            self.get_cam = False
             self.startPlay()
         else:
             self.video_frame = True
