@@ -37,7 +37,7 @@ class MyApp(QMainWindow, main_ui):
         self.cam_message = QMessageBox() # 캠 메시지
         self.video_pushButton.clicked.connect(self.getVideo_button) # 비디오 선택 버튼
         self.video_listWidget.itemDoubleClicked.connect(self.selectVideo) # 비디오 리스트 중 선택
-        self.videoplay_pushButton.clicked.connect(self.Video_button)
+        self.videoplay_pushButton.clicked.connect(self.Video_button) # 비디오 재생/정지 버튼
 
         self.exit_Button.clicked.connect(self.prgram_exit) # 종료 버튼
 
@@ -58,6 +58,7 @@ class MyApp(QMainWindow, main_ui):
     def camSetting_button(self):
         self.get_cam = True
         self.change_cam = False
+        self.get_video = False
 
         self.cap = cv2.VideoCapture(self.cam_num, cv2.CAP_DSHOW)
 
@@ -71,7 +72,6 @@ class MyApp(QMainWindow, main_ui):
             self.cap = None
         else:
             self.startCamera()
-            self.get_video = False
             print('camera stop')
 
     def startCamera(self):
@@ -94,6 +94,7 @@ class MyApp(QMainWindow, main_ui):
         self.cap.release()
 
     def getVideo_button(self):
+        self.get_cam = False
         self.get_video = True
         self.video_path = QFileDialog.getOpenFileNames(self, 'Select video', self.init_dir)[0]
         print(self.video_path)
@@ -105,6 +106,7 @@ class MyApp(QMainWindow, main_ui):
             self.video_listWidget.clear()
 
     def selectVideo(self):
+        self.get_cam = False
         self.get_video = True
         self.idx = self.video_listWidget.currentRow()
         self.cap = cv2.VideoCapture(self.video_path[self.idx])
