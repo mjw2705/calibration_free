@@ -2,9 +2,7 @@ import cv2
 import csv
 import dlib
 import numpy as np
-import time
 from eye import *
-# from dlib_eye import *
 from utils import *
 
 
@@ -41,7 +39,7 @@ def calib_board(frame_shape, n_point, i, j):
 
 
 
-path = './jw_data/jw_data4/'
+path = './jw_data/ex/'
 whole_dir = 'whole_img'
 face_dir = 'face_img'
 check_dir = 'check_img'
@@ -51,7 +49,6 @@ click_pt = []
 face_size = (224, 224)
 frame_shape = (640, 480)
 cap = cv2.VideoCapture(1, cv2.CAP_DSHOW)
-# cap = cv2.VideoCapture('ex2.mp4')
 cap.set(cv2.CAP_PROP_FRAME_WIDTH, frame_shape[0])
 cap.set(cv2.CAP_PROP_FRAME_HEIGHT, frame_shape[1])
 cap.set(cv2.CAP_PROP_FPS, 30)
